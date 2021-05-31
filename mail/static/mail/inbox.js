@@ -57,13 +57,29 @@ function load_mailbox(mailbox) {
   fetch(`emails/${mailbox}`)
   .then(response => response.json())
   .then(emails => {
-      for (let email of emails){
+      emails.forEach(email => {
         const card_div = document.createElement('div');
         card_div.setAttribute("class", `card read-${email["read"]}`);
         card_div.setAttribute("id", `email-card`);
 
+        //create archive button for the email cards
+        const archive = document.createElement('button');
+        archive.setAttribute("class", "btn btn-outline-secondary float-right");
+        archive.setAttribute("id", "archive-mailbox");
+        archive.innerHTML = `${email["archived"] ? "Unarchive" : "Archive"}`
+        archive.addEventListener('click', () => {
+          fetch(`emails/${email["id"]}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                archived: !email["archived"],
+            })
+          })
+          .then(() => load_mailbox("inbox"));
+        });
+
         card_div.innerHTML = `
-          <div class="card-header">${email["sender"]}</div>
+          <div class="card-header">${email["sender"]}
+          </div>
           <div class="card-body">
             <blockquote class="blockquote mb-0">
               <p>${email["subject"]}</p>
@@ -71,11 +87,18 @@ function load_mailbox(mailbox) {
             </blockquote>
           </div>
         `;
-
-        card_div.addEventListener('click', () => load_email(email));
-        document.querySelector('#emails-view').append(card_div);   
+       
+        card_div.addEventListener('click', () => {
+          //prevent from listetnign to archive button
+          if (target.hasAttribute("#archive-mailbox")) {
+            return;
+          }
+          load_email(email);
+        });
+        card_div.appendChild(archive);
+        document.querySelector('#emails-view').append(card_div);
       }
-  });
+  )});
 }
 
 function load_email(email) {
@@ -109,7 +132,7 @@ function load_email(email) {
     </div>
     <hr>
     <button class="btn btn-outline-secondary" id="reply">Reply</button>
-    <button class="btn btn-outline-secondary" id="archive">${email["archive"] ? "Remove from archived" : "Archive" }</button>
+    <button class="btn btn-outline-secondary" id="archive">${email["archived"] ? "Unarchive" : "Archive" }</button>
   `;
   document.querySelector('#single-view').innerHTML = ""; //clear the previous contents
   document.querySelector('#single-view').append(card_div); 
