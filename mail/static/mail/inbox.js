@@ -62,16 +62,21 @@ function load_mailbox(mailbox) {
         if (mailbox === "sent" && email["archived"] === true){
           return;
         }
+        //create cards for email display
         const card_div = document.createElement('div');
         card_div.setAttribute("class", `card read-${email["read"]}`);
         card_div.setAttribute("id", `email-card`);
+        card_div.addEventListener('click', (e) => {
+          load_email(email);
+        });
 
         //create archive button for the email cards
         const archive = document.createElement('button');
         archive.setAttribute("class", "btn btn-outline-secondary float-right");
         archive.setAttribute("id", "archive-mailbox");
         archive.innerHTML = `${email["archived"] ? "Unarchive" : "Archive"}`
-        archive.addEventListener('click', () => {
+        archive.addEventListener('click', (e) => {
+          e.stopPropagation(); //to prevent from listening to click on card_div
           fetch(`emails/${email["id"]}`, {
             method: 'PUT',
             body: JSON.stringify({
@@ -91,15 +96,9 @@ function load_mailbox(mailbox) {
             </blockquote>
           </div>
         `;
-       
-        card_div.addEventListener('click', () => {
-          //prevent from listetnign to archive button
-          if (target.hasAttribute("#archive-mailbox")) {
-            return;
-          }
-          load_email(email);
-        });
-        card_div.appendChild(archive);
+        //insert archive button into the header of email
+        card_div.firstElementChild.append(archive);
+        //insert the whole email card into the emails-viewe
         document.querySelector('#emails-view').append(card_div);
       }
   )});
