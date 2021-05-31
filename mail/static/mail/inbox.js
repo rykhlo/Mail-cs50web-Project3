@@ -58,6 +58,10 @@ function load_mailbox(mailbox) {
   .then(response => response.json())
   .then(emails => {
       emails.forEach(email => {
+        //do not display archived emails in the sent mailbox
+        if (mailbox === "sent" && email["archived"] === true){
+          return;
+        }
         const card_div = document.createElement('div');
         card_div.setAttribute("class", `card read-${email["read"]}`);
         card_div.setAttribute("id", `email-card`);
