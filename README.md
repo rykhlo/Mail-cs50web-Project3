@@ -1,4 +1,4 @@
-# cs50web-Project2-Commerce
+# Mail-cs50web-Project3
 Design a front-end for an email client that makes API calls to send and receive emails.
 
 
