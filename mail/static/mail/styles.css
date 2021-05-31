@@ -3,6 +3,12 @@ textarea {
 }
 
 #email-card{
-    background-color: whitesmoke;
     margin: 2vw;
 }
+.read-true{
+    background-color: rgb(255, 255, 255);
+}
+.read-false{
+    background-color: rgb(209, 209, 209);
+}
+

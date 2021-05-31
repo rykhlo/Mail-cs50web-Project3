@@ -59,7 +59,7 @@ function load_mailbox(mailbox) {
   .then(emails => {
       for (let email of emails){
         const card_div = document.createElement('div');
-        card_div.setAttribute("class", `card`);
+        card_div.setAttribute("class", `card read-${email["read"]}`);
         card_div.setAttribute("id", `email-card`);
 
         card_div.innerHTML = `
@@ -104,11 +104,12 @@ function load_email(email) {
       <h6 class="card-header">Subject: ${email["subject"]}</h6>
       <h6 class="card-header">Time Sent: ${email["timestamp"]}</h6>
       <div class="card-body">
-      <p class="card-text"> ${email["body"]}</p>
+      <span>${email["body"].replace(/\n/g, "<br />")}</span>
+      </div>
     </div>
     <hr>
-    <button type="button" class="btn btn-outline-secondary" id="reply">Reply</button>
-    <button type="button" class="btn btn-outline-secondary" id="archive">${email["archive"] ? "Remove from archived" : "Archive" }</button>
+    <button class="btn btn-outline-secondary" id="reply">Reply</button>
+    <button class="btn btn-outline-secondary" id="archive">${email["archive"] ? "Remove from archived" : "Archive" }</button>
   `;
   document.querySelector('#single-view').innerHTML = ""; //clear the previous contents
   document.querySelector('#single-view').append(card_div); 
@@ -118,9 +119,10 @@ function load_email(email) {
     fetch(`emails/${email["id"]}`, {
       method: 'PUT',
       body: JSON.stringify({
-          archive: !email["archived"],
+          archived: !email["archived"],
       })
     })
+    .then(() => load_mailbox("inbox"));
   });
 
   //click on the reply button
